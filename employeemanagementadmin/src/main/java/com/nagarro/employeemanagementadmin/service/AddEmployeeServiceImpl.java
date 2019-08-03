@@ -7,6 +7,7 @@ import org.springframework.web.client.RestTemplate;
 import com.nagarro.employeemanagementadmin.pojo.Employee;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 @Service
 public class AddEmployeeServiceImpl {
@@ -14,6 +15,7 @@ public class AddEmployeeServiceImpl {
 	@Autowired
 	private EurekaClient client;
 	
+	@HystrixCommand(fallbackMethod = "unknown")
 	public String addEmployeeMethod(Employee employee) {
 		InstanceInfo instanceInfo=client.getNextServerFromEureka("employeemanagement", false);
 		String uri = instanceInfo.getHomePageUrl()+"api";
@@ -23,4 +25,7 @@ public class AddEmployeeServiceImpl {
 	    return result;
 	}
 
+	public String unknown(Employee employee) {
+		return "unknown";
+	}
 }
